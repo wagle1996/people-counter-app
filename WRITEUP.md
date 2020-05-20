@@ -8,7 +8,7 @@ questions.
 
 The rundown of supported layers from prior legitimately identifies with whether a given layer is a custom layer. Any layer not in that rundown is naturally named a custom layer by the Model Optimizer. To really include custom layers, there are a couple of contrasts relying upon the first model system. In both TensorFlow and Caffe, the principal alternative is to enroll the custom layers as augmentations to the Model Optimizer. 
 
-For Caffe, the subsequent choice is to enroll the layers as Custom, at that point use Caffe to figure the yield state of the layer. You'll require Caffe on your framework to do this choice. 
+For Caffe, the subsequent choice is to enroll the layers as Custom, at that point use Caffe to figure the yield state of the layer. 
 
 For TensorFlow, its subsequent choice is to really supplant the unsupported subgraph with an alternate subgraph. The last TensorFlow alternative is to really offload the calculation of the subgraph back to TensorFlow during derivation. 
 
@@ -39,47 +39,23 @@ My method(s) to compare models before and after conversion to Intermediate Repre
 were :
 
 The size of the model pre- and post-conversion was almost the same. The SSD MobileNet V2 COCO model .pb file is about 66.4 MB and the IR bin file is 64.1 MB.
-
 The inference time of the model pre- and post-conversion was approximately about 73ms. 
-I tested pretrained model from open zoo and found that pretained model has less inference time than the open source model. The pretrained model i used was person-detection-retail-0013 model. It had inference time of 43ms only. It had better accuracy than the previous.
+
+I also  tested pretrained model from open zoo and found that pretained model has less inference time than the open source model. The pretrained model i used was person-detection-retail-0013 model. It had inference time of 43ms only. It had better accuracy than the previous. The size of the model file was only 2.59 mb.
+
 
 
 ## Assess Model Use Cases
 
-Some of the potential use cases of the people counter app are, at the retail to keep a track of the people based on their interest, and at the traffic signal to make sure that people crosses safely.Monitor passenger traffic flow in air port and train station and Assign staff deployment based on demand. It is also very useful in queue management. 
+Some of the potential use cases of the people counter app are, at the shops to keep the track of cutomers by their interest, and at the traffic signal to make sure that people crosses safely.Monitor passenger traffic flow in air port and train station and Assign staff deployment based on demand. It is also very useful in queue management. 
 
 ## Assess Effects on End User Needs
 
 Lighting, model accuracy, and camera focal length/image size have different effects on a deployed edge model. The potential effects of each of these are as follows:
 
--Lighting and Focal Length of the camera depends on the system installed. A bad lighting can seriosly reduces the accuracy of the model.
+-In day light the quality is not affected but in the night light and dim light the performance is affected.
 
--One thing to notice is that, the camera's angle plays an important role that has affects on both the lighting as well as model accuracy.
+-Camera angle also highly affects the accuracy. The model did not detected properly when the camera angle was changed
 
--The camera image size should be compatible with the model for proper detection. The model accuracy is calculated using the confusion matrix which gives the details about the occurance of false postivites and negatives which degrades the accuracy of the model.
+-The image size should also be in proporational with the model accuracy. Otherwise the detection confusion matrix will be highly affected. There will be more false negatives.
 
-## Model Research
-
-[This heading is only required if a suitable model was not found after trying out at least three
-different models. However, you may also use this heading to detail how you converted 
-a successful model.]
-
-In investigating potential people counter models, I tried each of the following three models:
-
-- Model 1: [Name]
-  - [Model Source]
-  - I converted the model to an Intermediate Representation with the following arguments...
-  - The model was insufficient for the app because...
-  - I tried to improve the model for the app by...
-  
-- Model 2: [Name]
-  - [Model Source]
-  - I converted the model to an Intermediate Representation with the following arguments...
-  - The model was insufficient for the app because...
-  - I tried to improve the model for the app by...
-
-- Model 3: [Name]
-  - [Model Source]
-  - I converted the model to an Intermediate Representation with the following arguments...
-  - The model was insufficient for the app because...
-  - I tried to improve the model for the app by...
