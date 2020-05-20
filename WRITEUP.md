@@ -15,12 +15,11 @@ For TensorFlow, its subsequent choice is to really supplant the unsupported subg
 You'll get an opportunity to rehearse this in the following activity. Once more, as this is a propelled point, we won't dig a lot of more profound here, yet don't hesitate to look at the connected documentation on the off chance that you need to know more.
 The process behind converting custom layers involves the following.
 
--Generate the Extension Template Files Using the Model Extension Generator
--Using Model Optimizer to Generate IR Files Containing the Custom Layer
--Edit the CPU Extension Template Files
--Execute the Model with the Custom Layer
+First of all Generate the Extension Template Files Using the Model Extension Generator and then Using Model Optimizer generate IR Files Containing the Custom Layer and then edit the CPU Extension Template Files finally, execute the Model with the Custom Layer
 I used ssd_mobilenet_v2_coco_2018_03_29 model for person detection. First of all i used wget to download the model from the repository via link http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v1_coco_2018_01_28.tar.gz. It is Supported Frozen Topology from TensorFlow Object Detection Models Zoo. after that i unzipped the tar using Tar -xvf command. 
 using tar -xvf ssd_mobilenet_v2_coco_2018_03_29.tar.gz
+
+
 after that for converting model to IR i  downloaded SSD MobileNet V2 COCO model's .pb file using the model optimizer using the command.
 python /opt/intel/openvino/deployment_tools/model_optimizer/mo.py --input_model frozen_inference_graph.pb --tensorflow_object_detection_api_pipeline_config pipeline.config --reverse_input_channels --tensorflow_use_custom_operations_config /opt/intel/openvino/deployment_tools/model_optimizer/extensions/front/tf/ssd_v2_support.json
 
@@ -37,18 +36,18 @@ for video file: python main.py -i resources/Pedestrian_Detect_2_1_1.mp4 -m "/hom
 ## Comparing Model Performance
 
 My method(s) to compare models before and after conversion to Intermediate Representations
-were 
-The difference between model accuracy pre- and post-conversion was that, SSD MobileNet V2 IR detects less no of people with a high accuracy but fails to continuously track subject that is idle.
+were :
 
 The size of the model pre- and post-conversion was almost the same. The SSD MobileNet V2 COCO model .pb file is about 66.4 MB and the IR bin file is 64.1 MB.
 
-The inference time of the model pre- and post-conversion was 70ms. I tested both pre-trained model and the converted model, where turns out that, the pre-trained model from openzoo had a lesser inference time that the converted model. Also, the detection was so accurate with the pre-trained model.
+The inference time of the model pre- and post-conversion was approximately about 73ms. 
+I tested pretrained model from open zoo and found that pretained model has less inference time than the open source model. The pretrained model i used was person-detection-retail-0013 model. It had inference time of 43ms only. It had better accuracy than the previous.
+
 
 ## Assess Model Use Cases
 
-Some of the potential use cases of the people counter app are, at the retail to keep a track of the people based on their interest, and at the traffic signal to make sure that people crosses safely.Monitor passenger traffic flow in air port and train station.and Assign staff deployment based on demand.
+Some of the potential use cases of the people counter app are, at the retail to keep a track of the people based on their interest, and at the traffic signal to make sure that people crosses safely.Monitor passenger traffic flow in air port and train station and Assign staff deployment based on demand. It is also very useful in queue management. 
 
-Each of these use cases would be useful because, it allows us to improve marketing strategy of the retail and as well as safety of the pedestrian.
 ## Assess Effects on End User Needs
 
 Lighting, model accuracy, and camera focal length/image size have different effects on a deployed edge model. The potential effects of each of these are as follows:
