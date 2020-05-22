@@ -5,22 +5,15 @@ have a different format you prefer, feel free to use it as long as you answer al
 questions.
 
 ## Explaining Custom Layers
+I didnot used custom layers while doing my project.
 
-The rundown of supported layers from prior legitimately identifies with whether a given layer is a custom layer. Any layer not in that rundown is naturally named a custom layer by the Model Optimizer. To really include custom layers, there are a couple of contrasts relying upon the first model system. In both TensorFlow and Caffe, the principal alternative is to enroll the custom layers as augmentations to the Model Optimizer. 
+## Model conversion process
 
-For Caffe, the subsequent choice is to enroll the layers as Custom, at that point use Caffe to figure the yield state of the layer. 
-
-For TensorFlow, its subsequent choice is to really supplant the unsupported subgraph with an alternate subgraph. The last TensorFlow alternative is to really offload the calculation of the subgraph back to TensorFlow during derivation. 
-
-You'll get an opportunity to rehearse this in the following activity. Once more, as this is a propelled point, we won't dig a lot of more profound here, yet don't hesitate to look at the connected documentation on the off chance that you need to know more.
-The process behind converting custom layers involves the following.
-
-First of all Generate the Extension Template Files Using the Model Extension Generator and then Using Model Optimizer generate IR Files Containing the Custom Layer and then edit the CPU Extension Template Files finally, execute the Model with the Custom Layer
-I used ssd_mobilenet_v2_coco_2018_03_29 model for person detection. First of all i used wget to download the model from the repository via link http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v1_coco_2018_01_28.tar.gz. It is Supported Frozen Topology from TensorFlow Object Detection Models Zoo. after that i unzipped the tar using Tar -xvf command. 
+ First of all i used wget to download the model from the repository via link http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v1_coco_2018_01_28.tar.gz. It is Supported Frozen Topology from TensorFlow Object Detection Models Zoo. after that i unzipped the tar using Tar -xvf command. 
 using tar -xvf ssd_mobilenet_v2_coco_2018_03_29.tar.gz
 
 
-after that for converting model to IR i  downloaded SSD MobileNet V2 COCO model's .pb file using the model optimizer using the command.
+after that for converting model to IR I  downloaded SSD MobileNet V2 COCO model's .pb file using the model optimizer using the command.
 python /opt/intel/openvino/deployment_tools/model_optimizer/mo.py --input_model frozen_inference_graph.pb --tensorflow_object_detection_api_pipeline_config pipeline.config --reverse_input_channels --tensorflow_use_custom_operations_config /opt/intel/openvino/deployment_tools/model_optimizer/extensions/front/tf/ssd_v2_support.json
 
 In above command opt/intel/openvino/deployment_tools/model_optimizer/mo.py path is path to model optimizer file. The next argument input_model frozen_inference_graph.pb is the input model for conversion which is in pb format. next is configuration file . this is pipe line config file. I also reveresed the input channel. At last fed in the json file.the conversion was sucessful, it formed .xml file and .bin file. 
