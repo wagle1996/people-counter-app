@@ -72,7 +72,7 @@ def connect_mqtt():
     client = mqtt.Client()
     client.connect(MQTT_HOST, MQTT_PORT, MQTT_KEEPALIVE_INTERVAL)
     return client
-def output(frame, result):
+def output(frame, result,initial_w,initial_h):
     """
     Parse SSD output.
     :param frame: frame from camera/video
@@ -88,7 +88,7 @@ def output(frame, result):
             ymin = int(obj[4] * initial_h)
             xmax = int(obj[5] * initial_w)
             ymax = int(obj[6] * initial_h)
-            cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 55, 255), 1)
+            cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0,255,0), 1)
             current_count = current_count + 1
     return frame, current_count
 
@@ -133,6 +133,7 @@ def infer_on_stream(args, client):
         input_validation = video
         assert os.path.isfile(args.input), "file doesn't exist"	
     ### TODO: Handle the input stream ###
+    
     cap = cv2.VideoCapture(input_validation)
     cap.open(input_validation)
 
@@ -149,17 +150,14 @@ def infer_on_stream(args, client):
     report = 0
     current_count = 0
     last_count = 0
+    infer_time=0
+    total_frames=0
     ### TODO: Loop until stream is over ###
     
     while cap.isOpened():
         ### TODO: Read from the video capture ###
         flag, frame = cap.read()
         prob_threshold = args.prob_threshold
-        if not flag:
-            break
-
-        ### TODO: Read from the video capture ###
-        flag, frame = cap.read()
         if not flag:
             break
   
@@ -180,17 +178,22 @@ def infer_on_stream(args, client):
         ### TODO: Wait for the result ###
         if infer_network.wait(request) == 0:
             det_time = time.time() - inf_start
+            infer_time=infer_time + det_time * 1000
+            total_frames = total_frames +1
             # Results of the output layer of the network
             result = infer_network.get_output(request)
             #if args.perf_counts:
                 #perf_count = infer_network.performance_counter(request)
                 #performance_counts(perf_count)
 
-            frame, current_count = output(frame, result)
+            frame, current_count = output(frame, result,initial_w,initial_h)
             inf_time_message = "Inference time: {:.3f}ms"\
                                .format(det_time * 1000)
             cv2.putText(frame, inf_time_message, (15, 15),
-                        cv2.FONT_HERSHEY_COMPLEX, 0.5, (200, 10, 10), 1)
+                        cv2.FONT_HERSHEY_SCRIPT_COMPLEX, 0.5, (0, 55, 255), 1)
+            message = "Average time: {:.3f}ms".format(infer_time/total_frames)
+            cv2.putText(frame, message, (15, 35), cv2.FONT_HERSHEY_SCRIPT_COMPLEX, 0.5, (255,0,0), 1)
+            
 
             # When new person enters the video
             if current_count > last_count:
@@ -203,26 +206,33 @@ def infer_on_stream(args, client):
                 duration = int(time.time() - start_time)
                 # Publish messages to the MQTT server
                 client.publish("person/duration",
-                               json.dumps({"duration": duration}))
-            
+                               json.dumps({"duration": duration})) 
 
             client.publish("person", json.dumps({"count": current_count}))
             last_count = current_count
             
             
+            
 
-            if key_pressed == 27:
-                break
+            
             
 
         ### TODO: Send the frame to the FFMPEG server ###
         frame = cv2.resize(frame, (768, 432))
         sys.stdout.buffer.write(frame)
         sys.stdout.flush()
+        if key_pressed == 27:
+               #print ("Exiting due to keyboard interrupt");
+                break
 
         ### TODO: Write an output image if `single_image_mode` ###
         if single_img_flag:
             cv2.imwrite('output_image.jpg', frame)
+        ### TODO: Close the stream and any windows at the end of the application
+        #cap.release()
+        #cap.release()
+        #cv2.destroyAllWindows()
+
 
 
 def main():
@@ -231,7 +241,8 @@ def main():
     :return: None
     """
     # Grab command line args
-    args = build_argparser().parse_args()
+    args = build_argparser()
+    args =args.parse_args()
     # Connect to the MQTT server
     client = connect_mqtt()
     # Perform inference on the input stream
