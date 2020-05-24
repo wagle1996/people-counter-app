@@ -79,18 +79,18 @@ def output(frame, result,initial_w,initial_h):
     :param result: list contains the data to parse ssd
     :return: person count and frame
     """
-    count = 0
-    for box in result[0][0]:
+    current_count = 0
+    for obj in result[0][0]:
         # Draw bounding box for object when it's probability is more than
         #  the specified threshold
-        if int(box[1])==1 and box[2] > prob_threshold:
-            xmin = int(box[3] * initial_w)
-            ymin = int(box[4] * initial_h)
-            xmax = int(box[5] * initial_w)
-            ymax = int(box[6] * initial_h)
+        if obj[2] > prob_threshold:
+            xmin = int(obj[3] * initial_w)
+            ymin = int(obj[4] * initial_h)
+            xmax = int(obj[5] * initial_w)
+            ymax = int(obj[6] * initial_h)
             cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0,255,0), 1)
-            count = count + 1
-    return frame, count
+            current_count = current_count + 1
+    return frame, current_count
 
 def infer_on_stream(args, client):
     """
@@ -168,7 +168,7 @@ def infer_on_stream(args, client):
         image = image.reshape(1, *image.shape)
 
         ### TODO: Start asynchronous inference for specified request ###
-       # net_input = {'image_tensor': image,'image_info': image.shape[1:]}
+       # net_input = {'image_tensor': image_p,'image_info': image_p.shape[1:]}
         duration_report = None
         inf_start = time.time()
         infer_network.exec_net(request, image)
@@ -191,8 +191,8 @@ def infer_on_stream(args, client):
                                .format(det_time * 1000)
             cv2.putText(frame, inf_time_message, (15, 15),
                         cv2.FONT_HERSHEY_SCRIPT_COMPLEX, 0.5, (0, 55, 255), 1)
-            #message = "Average time: {:.3f}ms".format(infer_time/total_frames)
-            #cv2.putText(frame, message, (15, 35), cv2.FONT_HERSHEY_SCRIPT_COMPLEX, 0.5, (255,0,0), 1)
+            message = "Average time: {:.3f}ms".format(infer_time/total_frames)
+            cv2.putText(frame, message, (15, 35), cv2.FONT_HERSHEY_SCRIPT_COMPLEX, 0.5, (255,0,0), 1)
             
 
             # When new person enters the video
@@ -200,8 +200,10 @@ def infer_on_stream(args, client):
                 start_time = time.time()
                 total_count = total_count + current_count - last_count
                 client.publish("person", json.dumps({"total": total_count}))
-
-            # Person's duration in the video is calculated
+            #adding current count to frame 
+            dist = "current_count: %d " %current_count
+            cv2.putText(frame, dist, (15, 65), cv2.FONT_HERSHEY_SCRIPT_COMPLEX, 0.5, (255,0,0), 1)
+            # Person duration in the video is calculated
             if current_count < last_count:
                 duration = int(time.time() - start_time)
                 # Publish messages to the MQTT server
@@ -211,6 +213,9 @@ def infer_on_stream(args, client):
             client.publish("person", json.dumps({"count": current_count}))
             last_count = current_count
             
+            #adding total count to frame 
+            tot = "total_count: %d " %total_count
+            cv2.putText(frame, tot, (15, 85), cv2.FONT_HERSHEY_SCRIPT_COMPLEX, 0.5, (255,0,0), 1)
             
             
 
@@ -218,18 +223,17 @@ def infer_on_stream(args, client):
             
 
         ### TODO: Send the frame to the FFMPEG server ###
-        frame = cv2.resize(frame, (768, 432))
+        #frame = cv2.resize(frame, (768, 432))
         sys.stdout.buffer.write(frame)
         sys.stdout.flush()
         if key_pressed == 27:
                #print ("Exiting due to keyboard interrupt");
                 break
 
-        ### TODO: If`single_image_mode` ###
+        ### TODO: Write an output image if `single_image_mode` ###
         if single_img_flag:
             cv2.imwrite('output_image.jpg', frame)
-       
-       ### TODO: Close the stream and any windows at the end of the application
+        ### TODO: Close the stream and any windows at the end of the application
         #cap.release()
         #cap.release()
         #cv2.destroyAllWindows()
