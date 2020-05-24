@@ -164,14 +164,14 @@ def infer_on_stream(args, client):
         key_pressed = cv2.waitKey(60)
         ### TODO: Pre-process the image as needed ###
         image = cv2.resize(frame, (network_shape[3],network_shape[2]))
-        image_p = image.transpose((2, 0, 1))
-        image_p = image_p.reshape(1, *image_p.shape)
+        image = image.transpose((2, 0, 1))
+        image = image.reshape(1, *image.shape)
 
         ### TODO: Start asynchronous inference for specified request ###
-       # net_input = {'image_tensor': image_p,'image_info': image_p.shape[1:]}
+       # net_input = {'image_tensor': image,'image_info': image.shape[1:]}
         duration_report = None
         inf_start = time.time()
-        infer_network.exec_net(request, image_p)
+        infer_network.exec_net(request, image)
         color = (255,0,0)
 
 
