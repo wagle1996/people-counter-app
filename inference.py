@@ -66,15 +66,15 @@ class Network:
             if l not in supported_layers_path:
                 unsupported_layers_path=l
         if len(unsupported_layers_path) != 0:
-            print("Unsupported layers found: {}".format(unsupported_layers_path))
-            print("Check whether the extensions are available to add to IECore.")
+            #print("Unsupported layers found: {}".format(unsupported_layers_path))
+            #print("Check whether the extensions are available to add to IECore.")
             exit(1) 
     ### Load the network into the Inference Engine
         self.exec_network=self.plugin.load_network(self.network, "CPU")
         self.input_blob = next(iter(self.network.inputs))
         self.output_blob = next(iter(self.network.outputs))
 
-        print("IR is successfully loaded into Inference Engine.")
+        #print("IR is successfully loaded into Inference Engine.")
     
 
         return
