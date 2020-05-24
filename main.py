@@ -114,7 +114,7 @@ def infer_on_stream(args, client):
     
 
     ### TODO: Load the model through `infer_network` ###
-    infer_network.load_model(model, Device,1,1,request, Cpu_extension)
+    infer_network.load_model(model, Device,Cpu_extension)
     network_shape = infer_network.get_input_shape()
     ### TODO: Handle the input stream ###
     #check for live video cam
@@ -149,7 +149,6 @@ def infer_on_stream(args, client):
     report = 0
     current_count = 0
     last_count = 0
-    no, cd, hi, wx = infer_network.load_model(model, Device, 1, 1, request,Cpu_extension)[1]
     ### TODO: Loop until stream is over ###
     
     while cap.isOpened():
@@ -166,7 +165,7 @@ def infer_on_stream(args, client):
   
         key_pressed = cv2.waitKey(60)
         ### TODO: Pre-process the image as needed ###
-        image = cv2.resize(frame, (wx,hi))
+        image = cv2.resize(frame, (network_shape[3],network_shape[2]))
         image_p = image.transpose((2, 0, 1))
         image_p = image_p.reshape(1, *image_p.shape)
 
@@ -205,9 +204,12 @@ def infer_on_stream(args, client):
                 # Publish messages to the MQTT server
                 client.publish("person/duration",
                                json.dumps({"duration": duration}))
+            
 
             client.publish("person", json.dumps({"count": current_count}))
             last_count = current_count
+            
+            
 
             if key_pressed == 27:
                 break
