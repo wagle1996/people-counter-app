@@ -22,7 +22,7 @@
 import os
 import sys
 import logging as log
-from openvino.inference_engine import IENetwork, IECore,IEPlugin
+from openvino.inference_engine import IENetwork, IECore
 
 
 class Network:
@@ -30,97 +30,71 @@ class Network:
     Load and configure inference plugins for the specified target devices 
     and performs synchronous and asynchronous modes for the specified infer requests.
     """
+    
 
     def __init__(self):
+        ### TODO: Initialize any class variables desired ###
         self.plugin = None
         self.network = None
         self.input_blob = None
         self.output_blob = None
-        self.exec = None
+        self.exec_network = None
         self.infer_request = None
 
-    def load_model(self, model, device, input_size, output_size, num_requests, cpu_extension=None, plugin=None):
+    def load_model(self, model, device="CPU", cpu_extension=None):
+        self.plugin=IECore()
         ### TODO: Load the model ###
-        ### TODO: Check for supported layers ###
-        ### TODO: Add any necessary extensions ###
-        ### TODO: Return the loaded inference plugin ###
-        ### Note: You may need to update the function parameters. ###
+        ### Load the Inference Engine API
+        self.plugin = IECore()
+
+    ### Load IR files into their related class
         model_xml = model
         model_bin = os.path.splitext(model_xml)[0] + ".bin"
-        # Plugin initialization for the required device
-        # load extension libraries
-        if not plugin:
-            log.info("Initializing plugin for {} device...".format(device))
-            self.plugin = IEPlugin(device=device)
-        else:
-            self.plugin = plugin
-            
-        #check cpu if required
-
-        if cpu_extension and 'CPU' in device:
-            self.plugin.add_cpu_extension(cpu_extension)
-
-        # Read Intermediate representation 
-        log.info("Reading IR...")
         self.network = IENetwork(model=model_xml, weights=model_bin)
-        log.info("Loading IR to the plugin...")
 
-        if self.plugin.device == "CPU":
-            supported_layers = self.plugin.get_supported_layers(self.network)
-            not_supported_layers = \
-                [l for l in self.network.layers.keys() if l not in supported_layers]
-            if len(not_supported_layers) != 0:
-                log.error("Following layers are not supported by "
-                          "the plugin for specified device {}:\n {}".
-                          format(self.plugin.device,
-                                 ', '.join(not_supported_layers)))
-                log.error("Please try to specify cpu extensions library path"
-                          " in command line parameters using -l "
-                          "or --cpu_extension command line argument")
-                sys.exit(1)
+    ### Add a CPU extension, if applicable.
+        self.plugin.add_extension(cpu_extension, "CPU")
 
-        if num_requests == 0:
-            # Loads network read from IR to the plugin
-            self.exec = self.plugin.load(network=self.network)
-        else:
-            self.exec = self.plugin.load(network=self.network, num_requests=num_requests)
+    ### Get the supported layers of the network
+        supported_layers = self.plugin.query_network(network=self.network, device_name="CPU")
 
+    ### Check for any unsupported layers, and let the user
+    ### know if anything is missing. Exit the program, if so.
+        unsupported_layers = [l for l in self.network.layers.keys() if l not in supported_layers]
+        if len(unsupported_layers) != 0:
+            print("Unsupported layers found: {}".format(unsupported_layers))
+            print("Check whether extensions are available to add to IECore.")
+            exit(1)
+
+    ### Load the network into the Inference Engine
+        self.exec_network=self.plugin.load_network(self.network, "CPU")
         self.input_blob = next(iter(self.network.inputs))
-        self.out_blob = next(iter(self.network.outputs))
-        assert len(self.network.inputs.keys()) == input_size, \
-            "Supports only {} input topologies".format(len(self.network.inputs))
-        assert len(self.network.outputs) == output_size, \
-            "Supports only {} output topologies".format(len(self.network.outputs))
+        self.output_blob = next(iter(self.network.outputs))
 
-        return self.plugin, self.get_input_shape()
+        print("IR successfully loaded into Inference Engine.")
+    
+
+        return
+        ### Note: You may need to update the function parameters. ###
 
     def get_input_shape(self):
         ### TODO: Return the shape of the input layer ###
-        #it returns the shape of the unput layer
+        #it returns the shape of the input layer
         return self.network.inputs[self.input_blob].shape
-        
 
     def exec_net(self, cur_request_id,image):
-        ### TODO: Start an asynchronous request ###
-        ### TODO: Return any necessary information ###
-        ### Note: You may need to update the function parameters. ###
-        self.infer_request_handle = self.exec.start_async(
-            request_id=cur_request_id, inputs={self.input_blob: image})
-        return self.exec
-
-    def wait(self,cur_request_id):
+        #start acynchronous request
+        self.infer_request_handle = self.exec_network.start_async(request_id=cur_request_id, inputs={self.input_blob: image})
+        return self.exec_network
+    def wait(self,  cur_request_id):
         ### TODO: Wait for the request to be complete. ###
         ### TODO: Return any necessary information ###
         ### Note: You may need to update the function parameters. ###
-        wait_n = self.exec.requests[cur_request_id].wait(-1)
+        wait_n = self.exec_network.requests[cur_request_id].wait(-1)
         return wait_n
 
 
-    def get_output(self, request_id, output=None):
+    def get_output(self, cur_request_id):
         ### TODO: Extract and return the output results
-        ### Note: You may need to update the function parameters. ##
-        if output:
-            result = self.infer_request_handle.outputs[output]
-        else:
-            result = self.exec.requests[request_id].outputs[self.out_blob]
-        return result
+        ### Note: You may need to update the function parameters. ###
+        return self.exec_network.requests[cur_request_id].outputs[self.output_blob]
