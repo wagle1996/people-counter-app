@@ -31,7 +31,7 @@ for video file: python main.py -i resources/Pedestrian_Detect_2_1_1.mp4 -m "/hom
 My method(s) to compare models before and after conversion to Intermediate Representations
 were :
 
-The size of the model pre- and post-conversion was almost the same. The SSD MobileNet V2 COCO model .pb file is about 66.4 MB and the IR bin file is 64.1 MB.
+The size of the model pre- and post-conversion was almost the same. The SSD MobileNet V2 COCO model .pb file is about 66.4 MB and the IR bin file is 64.1 MB. The performance of this model was not good. When there were 2 person on the frame the total people counted was 6.
 The inference time of the model pre- and post-conversion was approximately about 73ms. It's mean accuracy precision was 21 map. The accuracy was obtained from https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md.
 
 I also  tested pretrained model from open zoo and found that pretained model has less inference time than the open source model. The pretrained model i used was person-detection-retail-0013 model. It had inference time of 43ms only. It had better accuracy than the previous. The size of the model file was only 2.59 mb.
