@@ -25,14 +25,24 @@ BIN file: /home/workspace/ssd_mobilenet_v2_coco_2018_03_29/./frozen_inference_gr
 
 Finally i run the program using command:
 for video file: python main.py -i resources/Pedestrian_Detect_2_1_1.mp4 -m "/home/workspace/intel//ssd_mobilenet_v2_coco_2018_03_29/frozen_inference_graph.xml -l /opt/intel/openvino/deployment_tools/inference_engine/lib/intel64/libcpu_extension_sse4.so -d CPU -pt 0.6 | ffmpeg -v warning -f rawvideo -pixel_format bgr24 -video_size 768x432 -framerate 24 -i - http://0.0.0.0:3004/fac.ffm
+I also converted tensorflow-yolo-v3 model to Inference engine. For that i cloned git repository of yolo v3 model using link https://github.com/mystic123/tensorflow-yolo-v3.git after that downloaded the coco_names and yolov3.weights. And finally run the converter using command
+python3 convert_weights_pb.py --class_names coco.names --data_format NHWC --weights_file yolov3.weights
+and finally run the model using python main.py -i resources/Pedestrian_Detect_2_1_1.mp4 -m "/home/workspace/tensorflow-yolo-v3/frozen_darknet_yolov3_model.xml" -l /opt/intel/openvino/deployment_tools/inference_engine/lib/intel64/libcpu_extension_sse4.so -d CPU -pt 0.6 | ffmpeg -v warning -f rawvideo -pixel_format bgr24 -video_size 768x432 -framerate 24 -i - http://0.0.0.0:3004/fac.ffm
 
 ## Comparing Model Performance
 
 My method(s) to compare models before and after conversion to Intermediate Representations
 were :
-
-The size of the model pre- and post-conversion was almost the same. The SSD MobileNet V2 COCO model .pb file is about 66.4 MB and the IR bin file is 64.1 MB. The performance of this model was not good. When there were 2 person on the frame the total people counted was 6.
+SSD_mobilenet_v2_coco
+The size of ssd_mobilenet_v2_coco the model pre- and post-conversion was almost the same. The SSD MobileNet V2 COCO model .pb file is about 66.4 MB and the IR bin file is 64.1 MB. The performance of this model was not good. When there were 2 person on the frame the total people counted was 6.
 The inference time of the model pre- and post-conversion was approximately about 73ms. It's mean accuracy precision was 21 map. The accuracy was obtained from https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md.
+
+tensorflow_yolo_v3
+The size of yolo_v3 after conversion was heavier than earlier one. The Size of frozen_darknet_yolo.pb was 237 mb and size of frozen_darknet_yolo.bin was 236 mb. The performance of this model was worst among others. The inference time was fluctuating heavily. But the average time was 1095 ms most of the times. the map was 33 map. This model didnot detected person. 
+
+
+
+
 
 I also  tested pretrained model from open zoo and found that pretained model has less inference time than the open source model. The pretrained model i used was person-detection-retail-0013 model. It had inference time of 43ms only. It had better accuracy than the previous. The size of the model file was only 2.59 mb.
 
