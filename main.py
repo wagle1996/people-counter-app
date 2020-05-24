@@ -79,18 +79,18 @@ def output(frame, result,initial_w,initial_h):
     :param result: list contains the data to parse ssd
     :return: person count and frame
     """
-    current_count = 0
-    for obj in result[0][0]:
+    count = 0
+    for box in result[0][0]:
         # Draw bounding box for object when it's probability is more than
         #  the specified threshold
-        if obj[2] > prob_threshold:
-            xmin = int(obj[3] * initial_w)
-            ymin = int(obj[4] * initial_h)
-            xmax = int(obj[5] * initial_w)
-            ymax = int(obj[6] * initial_h)
+        if int(box[1])==1 and box[2] > prob_threshold:
+            xmin = int(box[3] * initial_w)
+            ymin = int(box[4] * initial_h)
+            xmax = int(box[5] * initial_w)
+            ymax = int(box[6] * initial_h)
             cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0,255,0), 1)
-            current_count = current_count + 1
-    return frame, current_count
+            count = count + 1
+    return frame, count
 
 def infer_on_stream(args, client):
     """
@@ -191,8 +191,8 @@ def infer_on_stream(args, client):
                                .format(det_time * 1000)
             cv2.putText(frame, inf_time_message, (15, 15),
                         cv2.FONT_HERSHEY_SCRIPT_COMPLEX, 0.5, (0, 55, 255), 1)
-            message = "Average time: {:.3f}ms".format(infer_time/total_frames)
-            cv2.putText(frame, message, (15, 35), cv2.FONT_HERSHEY_SCRIPT_COMPLEX, 0.5, (255,0,0), 1)
+            #message = "Average time: {:.3f}ms".format(infer_time/total_frames)
+            #cv2.putText(frame, message, (15, 35), cv2.FONT_HERSHEY_SCRIPT_COMPLEX, 0.5, (255,0,0), 1)
             
 
             # When new person enters the video
@@ -201,7 +201,7 @@ def infer_on_stream(args, client):
                 total_count = total_count + current_count - last_count
                 client.publish("person", json.dumps({"total": total_count}))
 
-            # Person duration in the video is calculated
+            # Person's duration in the video is calculated
             if current_count < last_count:
                 duration = int(time.time() - start_time)
                 # Publish messages to the MQTT server
@@ -225,10 +225,11 @@ def infer_on_stream(args, client):
                #print ("Exiting due to keyboard interrupt");
                 break
 
-        ### TODO: Write an output image if `single_image_mode` ###
+        ### TODO: If`single_image_mode` ###
         if single_img_flag:
             cv2.imwrite('output_image.jpg', frame)
-        ### TODO: Close the stream and any windows at the end of the application
+       
+       ### TODO: Close the stream and any windows at the end of the application
         #cap.release()
         #cap.release()
         #cv2.destroyAllWindows()
