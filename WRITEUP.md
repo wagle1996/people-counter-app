@@ -5,7 +5,15 @@ have a different format you prefer, feel free to use it as long as you answer al
 questions.
 
 ## Explaining Custom Layers
-I didnot used custom layers while doing my project.
+Although customs layers are  necessary and important to have feature of the OpenVINO™, they are not used often because of the supported layers.The list of supported layers from before straightforwardly relates to whether a given layer is a custom layer. Any layer not in that list is consequently delegated as a custom layer by the Model Optimizer. To actually add custom layers, there are a few differences depending on the original model framework.The process involved in customs layers are:
+1. In Cafee and tensor flow,  register the custom layers as extensions to the Model Optimizer.
+2. For Caffe, register the layers as Custom, then use Caffe to calculate the output shape of the layer. There should be caffe on the system for this.
+3. For TensorFlow,  Replace the unsupported subgraph with a different subgraph. The final TensorFlow option is to actually offload the computation of the subgraph back to TensorFlow during inference.
+4. After that use model Optimizer to generate IR Files Containing the Custom Layer
+5. Edit CPU extension Template files
+6. Finally execute the model with customs layers.
+
+
 
 ## Model conversion process
 
