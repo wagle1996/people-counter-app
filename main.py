@@ -197,7 +197,7 @@ def infer_on_stream(args, client):
                         cv2.FONT_HERSHEY_SCRIPT_COMPLEX, 0.5, (0, 55, 255), 1)
             message = "Average time: {:.3f}ms".format(infer_time/total_frames)
             cv2.putText(frame, message, (15, 35), cv2.FONT_HERSHEY_SCRIPT_COMPLEX, 0.5, (255,0,0), 1)
-            #
+            ## Delaying the detection/undetection by 15 duration frame to remove issues with wrongly calculated durations and counts due to flickering
             if current_count!=counter:
                 last_count=counter
                 counter=current_count
