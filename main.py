@@ -72,7 +72,8 @@ def connect_mqtt():
     client = mqtt.Client()
     client.connect(MQTT_HOST, MQTT_PORT, MQTT_KEEPALIVE_INTERVAL)
     return client
-def output(frame, result,initial_w,initial_h):
+
+def output(frame, result, initial_w, initial_h):
     """
     Parse SSD output.
     :param frame: frame from camera/video
@@ -81,9 +82,10 @@ def output(frame, result,initial_w,initial_h):
     """
     current_count = 0
     for obj in result[0][0]:
+        
         # Draw bounding box for object when it's probability is more than
         #  the specified threshold
-        if obj[2] > prob_threshold:
+        if  obj[2] >= prob_threshold:
             xmin = int(obj[3] * initial_w)
             ymin = int(obj[4] * initial_h)
             xmax = int(obj[5] * initial_w)
@@ -145,6 +147,8 @@ def infer_on_stream(args, client):
     #iniatilize variables
     
     duration = 0
+    last_duration=0
+    counter=0
     total_count = 0
     dur = 0
     report = 0
@@ -164,14 +168,14 @@ def infer_on_stream(args, client):
         key_pressed = cv2.waitKey(60)
         ### TODO: Pre-process the image as needed ###
         image = cv2.resize(frame, (network_shape[3],network_shape[2]))
-        image = image.transpose((2, 0, 1))
-        image = image.reshape(1, *image.shape)
+        image_p = image.transpose((2, 0, 1))
+        image_p = image_p.reshape(1, *image_p.shape)
 
         ### TODO: Start asynchronous inference for specified request ###
        # net_input = {'image_tensor': image_p,'image_info': image_p.shape[1:]}
         duration_report = None
         inf_start = time.time()
-        infer_network.exec_net(request, image)
+        infer_network.exec_net(request, image_p)
         color = (255,0,0)
 
 
@@ -186,39 +190,47 @@ def infer_on_stream(args, client):
                 #perf_count = infer_network.performance_counter(request)
                 #performance_counts(perf_count)
 
-            frame, current_count = output(frame, result,initial_w,initial_h)
+            frame, current_count = output(frame, result, initial_w, initial_h)
             inf_time_message = "Inference time: {:.3f}ms"\
                                .format(det_time * 1000)
             cv2.putText(frame, inf_time_message, (15, 15),
                         cv2.FONT_HERSHEY_SCRIPT_COMPLEX, 0.5, (0, 55, 255), 1)
             message = "Average time: {:.3f}ms".format(infer_time/total_frames)
             cv2.putText(frame, message, (15, 35), cv2.FONT_HERSHEY_SCRIPT_COMPLEX, 0.5, (255,0,0), 1)
+            #
+            if current_count!=counter:
+                last_count=counter
+                counter=current_count
             
-
-            # When new person enters the video
-            if current_count > last_count:
-                start_time = time.time()
-                total_count = total_count + current_count - last_count
-                client.publish("person", json.dumps({"total": total_count}))
-            #adding current count to frame 
-            dist = "current_count: %d " %current_count
-            cv2.putText(frame, dist, (15, 65), cv2.FONT_HERSHEY_SCRIPT_COMPLEX, 0.5, (255,0,0), 1)
-            # Person duration in the video is calculated
-            if current_count < last_count:
-                duration = int(time.time() - start_time)
-                # Publish messages to the MQTT server
-                client.publish("person/duration",
-                               json.dumps({"duration": duration})) 
-
-            client.publish("person", json.dumps({"count": current_count}))
-            last_count = current_count
+                if duration>=15:
+                    last_duration=duration
+                    duration=0
+                else:
+                    duration=last_duration+duration
+                    last_duration=0
+            else:
+                duration=duration+1
+                if duration>=15:
+                    report==counter
+                    ###todo calculate and send relevant information on###
+                    # When new person enters the video
+                    if duration==15 and counter>last_count:  
+                        total_count=total_count+counter-last_count
+                        client.publish("person", json.dumps({"count":report, "total": total_count}))
+                        # When new person leaves the video
+                    elif duration==15 and counter<last_count:
+                        duration_report=int((last_duration/10.0)*1000)
+                        client.publish("person/duration", json.dumps({"duration": duration_report}))
+                #adding current count to frame 
+                dist = "current_count: %d " %current_count
+                cv2.putText(frame, dist, (15, 65), cv2.FONT_HERSHEY_SCRIPT_COMPLEX, 0.5, (255,0,0), 1)
+                client.publish("person", json.dumps({"count": current_count}))
             
-            #adding total count to frame 
+             #adding total count to frame 
             tot = "total_count: %d " %total_count
             cv2.putText(frame, tot, (15, 85), cv2.FONT_HERSHEY_SCRIPT_COMPLEX, 0.5, (255,0,0), 1)
-            
-            
 
+              
             
             
 
