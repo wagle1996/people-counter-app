@@ -42,7 +42,7 @@ for video file:
  python main.py -i resources/Pedestrian_Detect_2_1_1.mp4 -m "/home/workspace/ssd_mobilenet_v2_coco_2018_03_29/frozen_inference_graph.xml" -l /opt/intel/openvino/deployment_tools/inference_engine/lib/intel64/libcpu_extension_sse4.so -d CPU -pt 0.4 | ffmpeg -v warning -f rawvideo -pixel_format bgr24 -video_size 768x432 -framerate 24 -i - http://0.0.0.0:3004/fac.ffm
    ```
    Remember Here I used  probability threshold of **0.4** for better accuracy and result. I got 100% Accuracy.
-
+# For person detection model from Openvino model zoo 
 
 I also converted tensorflow-yolo-v3 model to Inference engine. For that i cloned git repository of yolo v3 model using link https://github.com/mystic123/tensorflow-yolo-v3.git after that downloaded the coco_names and yolov3.weights. And finally run the converter using command
 python3 convert_weights_pb.py --class_names coco.names --data_format NHWC --weights_file yolov3.weights
@@ -69,18 +69,22 @@ I also  tested pretrained model from open zoo and found that pretained model has
 ## tensorflow_yolo_v3
 The size of yolo_v3 after conversion was heavier than earlier one. The Size of frozen_darknet_yolo.pb was 237 mb and size of frozen_darknet_yolo.bin was 236 mb. After the conversion, the inference time was fluctuating heavily. But the average time was 1095 ms most of the times. the map was 33 map. This model didnot detected person nicely. This model performance was weak compared to precious one.
 
+After analyzing these models we get that the SSD model and the person detection model from the open vino had al,ost same accuracy. But the tensorflow_yolo_v3 model did not worked properly
 
 ## Assess Model Use Cases
 
-Some of the potential use cases of the people counter app are, at the shops to keep the track of cutomers by their interest, and at the traffic signal to make sure that people crosses safely.Monitor passenger traffic flow in air port and train station and Assign staff deployment based on demand. It is also very useful in queue management. 
+Some of the potential use cases of the people counter app are:
+-At the shops to keep the track of cutomers by their interest, and at the traffic signal to make sure that people crosses safely.
+-Monitor passenger traffic flow in air port and train station and Assign staff deployment based on demand. 
+-It is also very useful in queue management. 
 
 ## Assess Effects on End User Needs
 
 Lighting, model accuracy, and camera focal length/image size have different effects on a deployed edge model. The potential effects of each of these are as follows:
 
--In day light the quality is not affected but in the night light and dim light the performance is affected.
+-In day light the quality is not affected but in the night light and dim light the performance is affected. In Night the light is dim so the low lighting can cause edges to be missed and thus miss detecting people in the frame
 
--Camera angle also highly affects the accuracy. The model did not detected properly when the camera angle was changed
+-Camera angle also highly affects the accuracy. The model did not detected properly when the camera angle was changed the changed camera angle misses the property of the object so the object is not detected properly.
 
 -The image size should also be in proporational with the model accuracy. Otherwise the detection confusion matrix will be highly affected. There will be more false negatives.
 
