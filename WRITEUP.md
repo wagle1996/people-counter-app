@@ -66,6 +66,12 @@ The size of ssd_mobilenet_v2_coco the model pre- and post-conversion was almost 
 ## Pretrained person detection Model
 I also  tested pretrained model from open zoo and found that pretained model has less inference time than the open source model. The pretrained model i used was person-detection-retail-0013 model. It had inference time of 43ms only. It had better accuracy than the previous. The size of the model file was only 2.59 mb. It has accuracy of 21 Map.
 
+|Test|Test Values|
+|-------------- | ------------- |
+|Inference time|43 ms|
+|Size of Model|2.59 MB|
+|Accuracy|100%|
+
 ## tensorflow_yolo_v3
 The size of yolo_v3 after conversion was heavier than earlier one. The Size of frozen_darknet_yolo.pb was 237 mb and size of frozen_darknet_yolo.bin was 236 mb. After the conversion, the inference time was fluctuating heavily. But the average time was 1095 ms most of the times. the map was 33 map. This model didnot detected person nicely. This model performance was weak compared to precious one.
 
@@ -74,9 +80,13 @@ After analyzing these models we get that the SSD model and the person detection 
 ## Assess Model Use Cases
 
 Some of the potential use cases of the people counter app are:
+
 -At the shops to keep the track of cutomers by their interest, and at the traffic signal to make sure that people crosses safely.
+
 -Monitor passenger traffic flow in air port and train station and Assign staff deployment based on demand. 
+
 -It is also very useful in queue management. 
+
 
 ## Assess Effects on End User Needs
 
