@@ -84,7 +84,7 @@ The size of yolo_v3 after conversion was heavier than earlier one. The Size of f
 
 
 --------------------------------------------------------------------------------------------------------------------------------------
-After analyzing these models we get that the SSD model and the person detection model from the open vino had al,ost same accuracy. But the tensorflow_yolo_v3 model did not worked properly. Based on the accuracy of the model used to detect people, this app's performance can varry. Edge devices are supposed to work almost instantly. Inference time of even 1000ms is not optimal for getting instantaneous results.
+After analyzing these models we get that the SSD model and the person detection model from the open vino had al,ost same accuracy. But the tensorflow_yolo_v3 model did not worked properly. Based on the accuracy of the model used to detect people, this app's performance can varry. Edge devices are supposed to work almost instantly.The inference spped was also higher after the conversion. The size of the model was reduced after conversion of model to IR. 
 
 ## Assess Model Use Cases
 
