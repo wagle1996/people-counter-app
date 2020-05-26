@@ -48,6 +48,11 @@ were :
 ## SSD_mobilenet_v2_coco 
 The size of ssd_mobilenet_v2_coco the model pre- and post-conversion was almost the same. The SSD MobileNet V2 COCO model .pb file is about 66.4 MB and the IR bin file is 64.1 MB. I tried to run the model on mobilenet classification before converting to IR. The inference speed before conversion was 80ms, which is higher than post conversion about 73ms. so the difference in inference time was about 6ms. The model before conversion measured 6 person measured in the given time frame getting about 95 % accuracy. where as after conversion got 100 % accuracy after maintaining the duration threshold.
 . From the other research I found It's mean accuracy precision was 21 map. The accuracy was obtained from https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md.
+|Test|before conversion to IR | after conversion to IR|Difference|
+|-------------- | ------------- |-------------|---------|
+|Inference time|80 ms|73ms|7ms|
+|Size of Model|66.4 MB|64.1 MB|2.3 MB|
+|Accuracy|95%|100%|5%|
 
 ## tensorflow_yolo_v3
 The size of yolo_v3 after conversion was heavier than earlier one. The Size of frozen_darknet_yolo.pb was 237 mb and size of frozen_darknet_yolo.bin was 236 mb. After the conversion, the inference time was fluctuating heavily. But the average time was 1095 ms most of the times. the map was 33 map. This model didnot detected person nicely. This model performance was weak compared to precious one.
@@ -55,6 +60,7 @@ The size of yolo_v3 after conversion was heavier than earlier one. The Size of f
 
 ## Pretrained person detection Model
 I also  tested pretrained model from open zoo and found that pretained model has less inference time than the open source model. The pretrained model i used was person-detection-retail-0013 model. It had inference time of 43ms only. It had better accuracy than the previous. The size of the model file was only 2.59 mb. It has accuracy of 21 Map.
+
 
 
 
