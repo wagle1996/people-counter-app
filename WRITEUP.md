@@ -13,6 +13,13 @@ Although customs layers are  necessary and important to have feature of the Open
 5. Edit CPU extension Template files
 6. Finally execute the model with customs layers.
 
+The main reason for using Custom Layers Include:
+1. For handling the unsupported layers custom layers are used.
+
+2. To optimize our pre-trained models and convert them to a IR without losing accuracy and to speed up the work the custom layers are used.
+
+3. OpenVino toolkit utilize model enhancer to reduce the size of the model. Model optimizer looks for the rundown of known layers for each layer in the model. The inference engine  loads the layers from the model IR into the predefined gadget module, which will look through a rundown of known layer usage for the gadget. In the event that your model architecure contains layer or layers that are not in the rundown of known layers for the device, the Inference Engine believes the layer to be unsupported and reports a mistake. To utilize the model having the unsupported layer we have to utilize the custom layer feature of OpenVino Toolkit
+
 
 
 ## Model conversion process
