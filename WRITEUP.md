@@ -75,7 +75,9 @@ I also  tested pretrained model from open zoo and found that pretained model has
 ## tensorflow_yolo_v3
 The size of yolo_v3 after conversion was heavier than earlier one. The Size of frozen_darknet_yolo.pb was 237 mb and size of frozen_darknet_yolo.bin was 236 mb. After the conversion, the inference time was fluctuating heavily. But the average time was 1095 ms most of the times. the map was 33 map. This model didnot detected person nicely. This model performance was weak compared to precious one.
 
-After analyzing these models we get that the SSD model and the person detection model from the open vino had al,ost same accuracy. But the tensorflow_yolo_v3 model did not worked properly
+
+--------------------------------------------------------------------------------------------------------------------------------------
+After analyzing these models we get that the SSD model and the person detection model from the open vino had al,ost same accuracy. But the tensorflow_yolo_v3 model did not worked properly. Based on the accuracy of the model used to detect people, this app's performance can varry. Edge devices are supposed to work almost instantly. Inference time of even 1000ms is not optimal for getting instantaneous results.
 
 ## Assess Model Use Cases
 
