@@ -46,11 +46,11 @@ My method(s) to compare models before and after conversion to Intermediate Repre
 were :
 
 ## SSD_mobilenet_v2_coco 
-The size of ssd_mobilenet_v2_coco the model pre- and post-conversion was almost the same. The SSD MobileNet V2 COCO model .pb file is about 66.4 MB and the IR bin file is 64.1 MB. The performance of this model was better. 
-The inference time of the model pre- and post-conversion was approximately about 73ms. It's mean accuracy precision was 21 map. The accuracy was obtained from https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md.
+The size of ssd_mobilenet_v2_coco the model pre- and post-conversion was almost the same. The SSD MobileNet V2 COCO model .pb file is about 66.4 MB and the IR bin file is 64.1 MB. I tried to run the model on mobilenet classification before converting to IR. The inference speed before conversion was 80ms, which is higher than post conversion about 73ms. so the difference in inference time was about 6ms. The model before conversion measured 6 person measured in the given time frame getting about 95 % accuracy. where as after conversion got 100 % accuracy after maintaining the duration threshold.
+.It's mean accuracy precision was 21 map. The accuracy was obtained from https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md.
 
 ## tensorflow_yolo_v3
-The size of yolo_v3 after conversion was heavier than earlier one. The Size of frozen_darknet_yolo.pb was 237 mb and size of frozen_darknet_yolo.bin was 236 mb. The performance of this model was worst among others. The inference time was fluctuating heavily. But the average time was 1095 ms most of the times. the map was 33 map. This model didnot detected person nicely.
+The size of yolo_v3 after conversion was heavier than earlier one. The Size of frozen_darknet_yolo.pb was 237 mb and size of frozen_darknet_yolo.bin was 236 mb. After the conversion, the inference time was fluctuating heavily. But the average time was 1095 ms most of the times. the map was 33 map. This model didnot detected person nicely. This model performance was weak compared to precious one.
 
 
 ## Pretrained person detection Model
