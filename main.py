@@ -73,7 +73,7 @@ def connect_mqtt():
     client.connect(MQTT_HOST, MQTT_PORT, MQTT_KEEPALIVE_INTERVAL)
     return client
 
-def bounding_box(frame, result, initial_w, initial_h):
+def bounding_box(frame, result, prob_threshold, initial_w, initial_h):
     """
     Parse SSD output.
     :param frame: frame from camera/video
@@ -105,7 +105,7 @@ def infer_on_stream(args, client):
     :return: None
     """
     # Initialise the class
-    global prob_threshold, initial_w, initial_h
+    prob_threshold, initial_w, initial_h
     infer_network = Network()
     # Set Probability threshold for detections
     prob_threshold = args.prob_threshold
