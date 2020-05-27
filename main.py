@@ -91,6 +91,8 @@ def output(frame, result, initial_w, initial_h):
             xmax = int(obj[5] * initial_w)
             ymax = int(obj[6] * initial_h)
             cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0,255,0), 1)
+            #Intializing aboove program using numpy array
+            # xmin,ymin,xmax,ymax= obj[3:7] * np.array([initial_w, initial_h, initial_w, initial_h])
             current_count = current_count + 1
     return frame, current_count
 
