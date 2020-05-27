@@ -73,7 +73,7 @@ def connect_mqtt():
     client.connect(MQTT_HOST, MQTT_PORT, MQTT_KEEPALIVE_INTERVAL)
     return client
 
-def output(frame, result, initial_w, initial_h):
+def bounding_box(frame, result, initial_w, initial_h):
     """
     Parse SSD output.
     :param frame: frame from camera/video
@@ -192,7 +192,7 @@ def infer_on_stream(args, client):
                 #perf_count = infer_network.performance_counter(request)
                 #performance_counts(perf_count)
 
-            frame, current_count = output(frame, result, initial_w, initial_h)
+            frame, current_count = bounding_box(frame, result, initial_w, initial_h)
             inf_time_message = "Inference time: {:.3f}ms"\
                                .format(det_time * 1000)
             cv2.putText(frame, inf_time_message, (15, 15),
