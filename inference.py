@@ -75,7 +75,7 @@ class Network:
         self.output_blob = next(iter(self.network.outputs))
 
         #print("IR is successfully loaded into Inference Engine.")
-    
+        #print
 
         return
         ### Note: You may need to update the function parameters. ###
